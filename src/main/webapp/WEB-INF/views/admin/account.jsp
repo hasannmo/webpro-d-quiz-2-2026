@@ -1,0 +1,101 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <jsp:include page="../fragments/head.jsp">
+        <jsp:param name="title" value="Admin Account Management — mijusan" />
+    </jsp:include>
+</head>
+<body class="flex min-h-screen flex-col bg-cream">
+    <jsp:include page="../fragments/navbar.jsp" />
+
+    <main class="flex-1">
+        <div class="min-h-[calc(100vh-200px)] bg-cream">
+            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+                <jsp:include page="../fragments/admin-sidebar.jsp" />
+
+                <div class="w-full flex-1 min-w-0">
+                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-sm md:p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-sand pb-4">
+                            <div>
+                                <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-ink">Account Management</h1>
+                                <p class="text-sm text-muted mt-1">Total Users: ${total}</p>
+                            </div>
+                            <a href="${pageContext.request.contextPath}/admin/add-user"
+                               class="inline-flex h-10 items-center justify-center rounded-xl bg-brand px-5 text-sm font-medium text-white shadow-sm hover:bg-brand-dark">
+                                + Add User
+                            </a>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="mt-6 overflow-x-auto">
+                            <table class="w-full text-left text-sm text-ink">
+                                <thead class="border-b border-sand bg-cream-dark text-xs uppercase text-muted">
+                                    <tr>
+                                        <th class="p-3">User</th>
+                                        <th class="p-3">Email</th>
+                                        <th class="p-3">Role</th>
+                                        <th class="p-3">Registered</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-sand/70">
+                                    <c:forEach var="u" items="${users}">
+                                        <tr class="hover:bg-cream/50">
+                                            <td class="p-3">
+                                                <div class="font-medium text-ink">${u.name}</div>
+                                                <div class="text-xs text-muted">@${u.username}</div>
+                                            </td>
+                                            <td class="p-3 text-muted">${u.email}</td>
+                                            <td class="p-3">
+                                                <form action="${pageContext.request.contextPath}/admin/update-role" method="POST" class="inline">
+                                                    <input type="hidden" name="id" value="${u.id}">
+                                                    <select name="role" onchange="this.form.submit()"
+                                                            class="rounded-lg border border-sand bg-white px-2 py-1 text-xs font-semibold ${u.admin ? 'text-brand-text' : 'text-ink'}">
+                                                        <option value="Customer" ${u.role == 'Customer' ? 'selected' : ''}>Customer</option>
+                                                        <option value="Administrator" ${u.role == 'Administrator' ? 'selected' : ''}>Administrator</option>
+                                                        <c:if test="${sessionScope.user.creator}">
+                                                            <option value="Creator" ${u.role == 'Creator' ? 'selected' : ''}>Creator</option>
+                                                        </c:if>
+                                                    </select>
+                                                </form>
+                                            </td>
+                                            <td class="p-3 text-xs text-muted">${u.createdAt}</td>
+                                            <td class="p-3 text-right">
+                                                <c:if test="${sessionScope.user.id != u.id}">
+                                                    <form action="${pageContext.request.contextPath}/admin/delete-user" method="POST" class="inline"
+                                                          onsubmit="return confirm('Remove user ${u.name}?');">
+                                                        <input type="hidden" name="id" value="${u.id}">
+                                                        <button type="submit" class="text-xs text-red-600 hover:underline">
+                                                            Remove
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <c:if test="${totalPages > 1}">
+                            <div class="mt-8 flex justify-center gap-2 border-t border-sand pt-6">
+                                <c:forEach begin="1" end="${totalPages}" var="pageIndex">
+                                    <a href="${pageContext.request.contextPath}/admin/account?page=${pageIndex}"
+                                       class="px-3.5 py-1.5 rounded-lg text-sm font-medium ${currentPage == pageIndex ? 'bg-brand text-white' : 'bg-white border border-sand text-ink hover:bg-cream'}">
+                                        ${pageIndex}
+                                    </a>
+                                </c:forEach>
+                            </div>
+                        </c:if>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <jsp:include page="../fragments/footer.jsp" />
+</body>
+</html>
