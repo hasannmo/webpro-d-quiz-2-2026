@@ -20,9 +20,7 @@
                 <div class="w-full flex-1 min-w-0">
                     <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
                         <!-- Range Select Header -->
-                        <div class="relative inline-block">
-                            <span class="text-base font-normal text-black">Order Over Time : <span class="font-medium text-brand-text">Last 7 Days</span></span>
-                        </div>
+                        <jsp:include page="../fragments/admin-range-select.jsp" />
 
                         <!-- Chart Container -->
                         <div class="mt-3 h-[240px] sm:h-[320px] w-full rounded-lg bg-cream-dark md:h-[500px]">

@@ -167,6 +167,23 @@ public class OrderDAO {
         return false;
     }
 
+    public List<Order> findCreatedAfter(String timestampStr) {
+        List<Order> list = new ArrayList<>();
+        String sql = "SELECT * FROM orders WHERE created_at >= ? ORDER BY created_at ASC";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, timestampStr);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     private Order mapResultSet(ResultSet rs) throws SQLException {
         Order o = new Order();
         o.setId(rs.getInt("id"));

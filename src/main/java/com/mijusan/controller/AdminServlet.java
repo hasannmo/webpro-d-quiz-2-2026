@@ -40,7 +40,13 @@ public class AdminServlet extends HttpServlet {
         String path = req.getServletPath();
 
         if ("/admin/dashboard".equals(path)) {
+            String selected = req.getParameter("range");
+            if (selected == null || selected.trim().isEmpty()) selected = "7d";
+            com.mijusan.model.ChartData chart = orderService.getChartForRange(selected);
+
             req.setAttribute("active", "dashboard");
+            req.setAttribute("selected", selected);
+            req.setAttribute("chart", chart);
             req.setAttribute("totalOrder", orderService.getTotalCount());
             req.setAttribute("totalUser", userService.getTotalCount());
             req.setAttribute("totalProduct", productService.getTotalCount());
@@ -77,6 +83,10 @@ public class AdminServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/admin/edit-product.jsp").forward(req, resp);
 
         } else if ("/admin/order".equals(path)) {
+            String selected = req.getParameter("range");
+            if (selected == null || selected.trim().isEmpty()) selected = "7d";
+            com.mijusan.model.ChartData chart = orderService.getChartForRange(selected);
+
             int page = parsePage(req.getParameter("page"));
             int pageSize = 10;
             List<Order> orders = orderService.paginate(page, pageSize);
@@ -84,6 +94,8 @@ public class AdminServlet extends HttpServlet {
             int totalPages = (int) Math.ceil((double) total / pageSize);
 
             req.setAttribute("active", "order");
+            req.setAttribute("selected", selected);
+            req.setAttribute("chart", chart);
             req.setAttribute("orders", orders);
             req.setAttribute("currentPage", page);
             req.setAttribute("totalPages", totalPages);
