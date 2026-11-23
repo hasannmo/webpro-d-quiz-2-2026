@@ -18,7 +18,10 @@ public class Database {
     }
 
     public static synchronized void init(String path) {
-        if (path != null && !path.trim().isEmpty()) {
+        String env = System.getenv("DB_PATH");
+        if (env != null && !env.trim().isEmpty()) {
+            dbPath = env;
+        } else if (path != null && !path.trim().isEmpty()) {
             dbPath = path;
         }
     }
