@@ -51,22 +51,18 @@ SQLite Database (WEB-INF/database.sqlite)
 
 ---
 
-## 🚀 How to Build & Run
+## 🚀 How to Run Locally
 
-### 1. Build the WAR Artifact
-Using the included Maven wrapper:
-```bash
-./mvnw clean package
-```
-This produces `target/ROOT.war` ready to deploy on any Servlet 5.0+ / 6.0 container (e.g. Apache Tomcat 10+).
+You can launch the complete site with one command:
 
-### 2. Deploy on Tomcat
-Deploy `target/ROOT.war` into Tomcat's `webapps/` folder:
 ```bash
-cp target/ROOT.war /path/to/tomcat/webapps/ROOT.war
-/path/to/tomcat/bin/startup.sh
+./run.sh
 ```
-Access the application at `http://localhost:8080/`.
+
+This will automatically package `target/ROOT.war`, configure local Tomcat 10, and boot the server at:
+👉 **[http://localhost:8080](http://localhost:8080)**
+
+Press `Ctrl+C` in your terminal when you want to stop the server.
 
 ---
 
