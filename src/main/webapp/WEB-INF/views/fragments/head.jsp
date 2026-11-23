@@ -6,3 +6,4 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/fonts-DAq_IamE.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app-DvVTEU7i.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/mobile-responsive.css">

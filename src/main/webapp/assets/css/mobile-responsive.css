@@ -1,0 +1,119 @@
+/* Responsive Mobile & Tablet Refinements for Mijusan Store */
+
+/* Ensure smooth responsive container behavior */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Site header & Navigation on mobile screens */
+@media (max-width: 768px) {
+    .site-header__inner {
+        height: 60px !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        gap: 8px !important;
+    }
+
+    .logo {
+        font-size: 22px !important;
+        line-height: 1 !important;
+    }
+
+    .search-bar {
+        width: auto !important;
+        flex: 1 1 auto !important;
+        max-width: 180px !important;
+        height: 36px !important;
+        padding: 0 10px !important;
+        border-radius: 18px !important;
+    }
+
+    .search-bar input {
+        font-size: 12px !important;
+    }
+
+    .header-icons {
+        gap: 6px !important;
+    }
+
+    .header-glass-pill {
+        padding: 4px 8px !important;
+        gap: 8px !important;
+    }
+
+    /* Section inner padding */
+    .section__inner {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    .hero-cards-wrap {
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+    }
+
+    /* Hero Banner height for compact mobile */
+    [data-hero-banner] img {
+        height: 220px !important;
+    }
+
+    /* Main lookbook carousel sizing */
+    [data-main-carousel] [data-track] > div {
+        width: 240px !important;
+    }
+
+    /* Section carousel sizing on mobile */
+    [data-section-carousel] [data-track] > div {
+        width: 210px !important;
+    }
+
+    /* Product grid 2 columns gap */
+    .grid-cols-2 {
+        gap: 8px !important;
+    }
+
+    /* Admin dashboard layout on mobile */
+    [data-admin-menu-root] {
+        width: 100% !important;
+        margin-bottom: 8px !important;
+    }
+
+    /* Footer styling */
+    .site-footer__inner {
+        padding: 24px 16px !important;
+        height: auto !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        text-align: center !important;
+    }
+}
+
+/* Small mobile devices (e.g. 320px - 400px width) */
+@media (max-width: 400px) {
+    .search-bar {
+        max-width: 130px !important;
+        height: 32px !important;
+        padding: 0 8px !important;
+    }
+
+    .search-bar input {
+        font-size: 11px !important;
+    }
+
+    .logo {
+        font-size: 18px !important;
+    }
+
+    [data-hero-banner] img {
+        height: 190px !important;
+    }
+
+    [data-main-carousel] [data-track] > div {
+        width: 200px !important;
+    }
+
+    [data-section-carousel] [data-track] > div {
+        width: 180px !important;
+    }
+}

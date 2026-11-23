@@ -59,16 +59,8 @@
                         </div>
 
                         <!-- Pagination -->
-                        <c:if test="${totalPages > 1}">
-                            <div class="mt-8 flex justify-center gap-2 border-t border-sand pt-6">
-                                <c:forEach begin="1" end="${totalPages}" var="pageIndex">
-                                    <a href="${pageContext.request.contextPath}/admin/product?page=${pageIndex}"
-                                       class="px-3.5 py-1.5 rounded-lg text-sm font-medium ${currentPage == pageIndex ? 'bg-brand text-white' : 'bg-white border border-sand text-ink hover:bg-cream'}">
-                                        ${pageIndex}
-                                    </a>
-                                </c:forEach>
-                            </div>
-                        </c:if>
+                        <c:set var="pageBaseUrl" value="${pageContext.request.contextPath}/admin/product?" scope="request"/>
+                        <jsp:include page="../fragments/pagination.jsp" />
                     </section>
                 </div>
             </div>
