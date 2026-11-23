@@ -1,28 +1,51 @@
 # 🛍️ Mijusan Store — Jakarta Servlet & JSP Architecture
 
+> 🌐 **Live Website**: [https://mijusan-76f5f.containers.snapdeploy.app/](https://mijusan-76f5f.containers.snapdeploy.app/)
+
 Mijusan is a full-featured minimalist fashion e-commerce web platform. This project represents a complete architectural migration from Laravel/PHP to a decoupled, robust **Java / Jakarta Servlet 6.0, JSP, JSTL & EL, DAO, Service, and JDBC** stack running on Apache Tomcat 10+ with SQLite.
 
-The platform retains the original custom design, responsive layouts, SVG visualizers, interactive carousels, and multi-tier role hierarchy while adhering strictly to enterprise MVC layer responsibilities.
+The platform retains the original custom design, responsive mobile layouts, SVG visualizers, interactive carousels, and multi-tier role hierarchy while adhering strictly to enterprise MVC layer responsibilities.
 
 ---
 
 ## 📋 Table of Contents
+- [Live Demo](#-live-demo)
 - [System Requirements](#-system-requirements)
 - [Quick Start Guide](#-quick-start-guide)
+- [Docker & Cloud Deployment](#-docker--cloud-deployment)
 - [Step-by-Step Manual Setup](#-step-by-step-manual-setup)
 - [Architecture & Layer Responsibilities](#-architecture--layer-responsibilities)
 - [Project Directory Structure](#-project-directory-structure)
 - [Database Schema & SQLite Management](#-database-schema--sqlite-management)
 - [Role Hierarchy & Demo Accounts](#-role-hierarchy--demo-accounts)
 - [CRUD Features Overview](#-crud-features-overview)
+- [Mobile & Responsive Optimization](#-mobile--responsive-optimization)
 - [Troubleshooting & Common Issues](#-troubleshooting--common-issues)
+
+---
+
+## 🌐 Live Demo
+
+The application is deployed and publicly accessible at:
+👉 **[https://mijusan-76f5f.containers.snapdeploy.app/](https://mijusan-76f5f.containers.snapdeploy.app/)**
+
+### Demo Accounts for Testing
+- **Creator Account** (Full system access, modify all roles):
+  - Email: `creator@mijusan.com`
+  - Password: `Mijusan2910@)`
+- **Administrator Account** (Store & order management):
+  - Email: `admin@mijusan.com`
+  - Password: `password`
+- **Customer Account** (Shopping, orders, wishlist):
+  - Email: `sarah.smith@example.com`
+  - Password: `password`
 
 ---
 
 ## 💻 System Requirements
 
 Before running the application locally, ensure you have:
-- **Operating System**: Linux (tested on Ubuntu/Debian), macOS, or Windows (WSL recommended)
+- **Operating System**: Linux (tested on Ubuntu/Debian/Arch), macOS, or Windows (WSL recommended)
 - **Java Development Kit (JDK)**: Java 17 or higher (tested with OpenJDK 17 and OpenJDK 27)
   ```bash
   java -version
@@ -42,7 +65,7 @@ The easiest way to build, package, and launch the application locally is using t
 
 ```bash
 # 1. Navigate to the project root directory
-cd /path/to/webpro-d-quiz-2-2026
+cd webpro-d-quiz-2-2026
 
 # 2. Grant executable permissions to wrapper and runner scripts
 chmod +x run.sh mvnw .tomcat/bin/*.sh
@@ -61,6 +84,34 @@ Open your web browser and navigate to:
 👉 **[http://localhost:8080](http://localhost:8080)**
 
 To stop the server, press `Ctrl + C` in your terminal.
+
+---
+
+## 🐳 Docker & Cloud Deployment
+
+The repository includes a multi-stage `Dockerfile` and `.dockerignore` ready for containerized hosting on platforms such as SnapDeploy, Render, Railway, Fly.io, or AWS ECS.
+
+### 1. Build the Docker Image Locally
+```bash
+docker build -t mijusan-store .
+```
+
+### 2. Run the Docker Container
+```bash
+docker run -d -p 8080:8080 --name mijusan mijusan-store
+```
+Then visit `http://localhost:8080`.
+
+### 3. Deploying to Cloud Platforms (SnapDeploy / Render)
+1. Push your repository to GitHub.
+2. In your cloud dashboard, create a new **Web Service** connected to your repo.
+3. Select **Docker** as the runtime.
+4. The service will automatically build the multi-stage image, bundle `ROOT.war` into Tomcat 10.1, and expose port `8080`.
+5. *(Optional)* If you wish to attach persistent disk storage for the database, set the environment variable:
+   ```text
+   DB_PATH=/var/data/database.sqlite
+   ```
+   If omitted, `Database.java` defaults automatically to `/WEB-INF/database.sqlite`.
 
 ---
 
@@ -137,7 +188,7 @@ JSP View (WEB-INF/views/) renders HTML response
 
 1. **Model Layer (`com.mijusan.model`)**:
    - Plain Old Java Objects (POJOs) with encapsulation, constructors, getters, and setters.
-   - Represents domain entities: `Product`, `Category`, `User`, `CartItem`, `Order`, `Wishlist`, `ChartData`.
+   - Represents domain entities: `Product`, `Category`, `User`, `CartItem`, `Order`, `Wishlist`, `ChartData`, `ChartPoint`.
    - Free of SQL, HTTP logic, or HTML tags.
 
 2. **DAO Layer (`com.mijusan.dao`)**:
@@ -145,7 +196,7 @@ JSP View (WEB-INF/views/) renders HTML response
    - Only layer that executes SQL queries. Parameterized queries eliminate SQL injection vulnerabilities.
 
 3. **Service Layer (`com.mijusan.service`)**:
-   - Encapsulates business validation, price totals, chart bucket calculations, password hashing (`BCrypt`), and multi-DAO operations.
+   - Encapsulates business validation, price totals, chart bucket calculations (`7d`, `1m`, `3m`, `6m`, `1y`), password hashing (`BCrypt`), and multi-DAO operations.
    - Controllers call Services; Controllers never touch DAOs directly.
 
 4. **Controller / Servlet Layer (`com.mijusan.controller`)**:
@@ -163,7 +214,9 @@ JSP View (WEB-INF/views/) renders HTML response
 
 ```text
 webpro-d-quiz-2-2026/
-├── pom.xml                               # Maven project descriptor
+├── pom.xml                               # Maven project descriptor (WAR packaging)
+├── Dockerfile                            # Multi-stage Docker build for container deployment
+├── .dockerignore                         # Docker ignore list
 ├── mvnw                                  # Offline Maven wrapper script
 ├── run.sh                                # Automated one-command build & launch script
 ├── .tomcat/                              # Standalone Apache Tomcat 10.1 server
@@ -193,37 +246,45 @@ webpro-d-quiz-2-2026/
         │   │   ├── AuthFilter.java       # Secures /admin/*, /cart, /wishlist, /myorder
         │   │   └── CartCountFilter.java  # Injects dynamic cart badge count into navbar
         │   ├── listener/
-        │   │   └── AppContextListener.java# Auto-initializes SQLite schema & seed data
+        │   │   └── AppContextListener.java# Auto-initializes SQLite database path on boot
         │   ├── model/                    # Domain Entity Models & DTOs
+        │   │   ├── CartItem.java
+        │   │   ├── Category.java
         │   │   ├── ChartData.java
         │   │   ├── ChartPoint.java
         │   │   ├── Order.java
         │   │   ├── Product.java
+        │   │   ├── ProductDTO.java
+        │   │   ├── SlideItem.java
         │   │   ├── User.java
-        │   │   └── ...
+        │   │   └── Wishlist.java
         │   ├── service/                  # Business Logic & Validation Services
         │   │   ├── CartService.java
+        │   │   ├── CategoryService.java
         │   │   ├── OrderService.java
         │   │   ├── ProductService.java
         │   │   ├── UserService.java
-        │   │   └── ...
+        │   │   └── WishlistService.java
         │   └── util/
-        │       ├── Database.java         # JDBC Connection pooling & SQLite resolution
+        │       ├── Database.java         # JDBC Connection pooling & DB_PATH env override
         │       ├── PasswordUtil.java     # BCrypt password hashing & verification
         │       └── SlugUtil.java         # URL slug generator
         └── webapp/
             ├── assets/                   # Public CSS, JavaScript, and Media
             │   ├── css/
+            │   │   ├── app-DvVTEU7i.css  # Compiled Tailwind styling
+            │   │   ├── fonts-DAq_IamE.css# Fraunces and Inter webfonts
+            │   │   └── mobile-responsive.css # Mobile layout, sizing & viewport adaptations
             │   ├── js/
             │   │   └── components.js     # User menu, dynamic chart tooltip & carousels
-            │   └── images/
+            │   └── images/               # Product lookbook and catalog photography
             └── WEB-INF/
                 ├── database.sqlite       # Pre-seeded SQLite database
                 ├── web.xml               # Servlet, filter, and error page mappings
                 └── views/                # Protected JSP View Templates
                     ├── admin/            # Dashboard, Orders, Products, Accounts
                     ├── auth/             # Login & Register views
-                    ├── fragments/        # Modular components (navbar, footer, chart, etc.)
+                    ├── fragments/        # Modular components (navbar, footer, chart, pagination)
                     ├── cart.jsp
                     ├── checkout.jsp
                     ├── home.jsp
@@ -322,6 +383,17 @@ The application features 8 complete CRUD modules:
 
 ---
 
+## 📱 Mobile & Responsive Optimization
+
+The user interface has been optimized for mobile displays (including small 320px–390px viewports):
+- **Responsive Header & Search**: Compact search bar and glass pill layout on smaller screens.
+- **Adaptive Hero Banners & Carousels**: Proportional scaling on touch devices to avoid vertical distortion.
+- **Two-Column Product Grid**: Product thumbnails, typography, and prices scale to fit mobile widths cleanly.
+- **Mobile-Friendly Pagination**: Collapses multi-page numeric lists on mobile into clean, thumb-friendly **Previous / Next** controls with page indicators, preventing layout breaks.
+- **Collapsible Admin Navigation**: Sidebar collapses into a mobile hamburger menu on phones and tablets.
+
+---
+
 ## 🔧 Troubleshooting & Common Issues
 
 ### 1. `Address already in use: bind` (Port 8080)
@@ -357,5 +429,6 @@ cp src/main/webapp/WEB-INF/database.sqlite .tomcat/webapps/ROOT/WEB-INF/database
 
 ## 📄 License & Credits
 Built for academic and demonstration purposes. All rights reserved.
+- **Live URL**: [https://mijusan-76f5f.containers.snapdeploy.app/](https://mijusan-76f5f.containers.snapdeploy.app/)
 - **Original Concept**: Mijusan Store
-- **Architecture**: Jakarta EE 10 (Servlet 6.0, JSP 3.1, JSTL 3.0), Java 17+, Apache Tomcat 10.1, SQLite.
+- **Architecture**: Jakarta EE 10 (Servlet 6.0, JSP 3.1, JSTL 3.0), Java 17+, Apache Tomcat 10.1, SQLite, Docker.
