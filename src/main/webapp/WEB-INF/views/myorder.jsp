@@ -7,48 +7,73 @@
         <jsp:param name="title" value="My Orders — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
     <jsp:include page="fragments/navbar.jsp" />
 
     <main class="flex-1">
-        <section class="section py-8">
-            <div class="section__inner max-w-5xl mx-auto px-4">
-                <div class="mb-6 border-b border-sand pb-4">
-                    <h1 class="font-serif text-2xl font-bold text-ink sm:text-3xl">My Orders</h1>
-                    <p class="mt-1 text-sm text-muted">Track your recent order history and delivery status</p>
+        <section class="section py-6 md:py-14">
+            <div class="section__inner max-w-5xl mx-auto">
+                <div class="mb-4 sm:mb-6 flex items-center gap-3 sm:gap-4">
+                    <a href="${pageContext.request.contextPath}/"
+                       class="inline-flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-white text-ink shadow-[0_2px_8px_rgb(43_36_32/0.12)] transition duration-200 hover:bg-brand hover:text-white"
+                       aria-label="Back to home">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="sm:h-5 sm:w-5">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </a>
+                    <h1 class="font-serif text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
+                        My Orders
+                    </h1>
                 </div>
 
                 <c:choose>
                     <c:when test="${not empty orders}">
-                        <div class="space-y-4">
-                            <c:forEach var="ord" items="${orders}">
-                                <div class="rounded-2xl border border-sand bg-white p-5 shadow-xs">
-                                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-sand pb-3">
-                                        <div>
-                                            <span class="font-mono text-sm font-semibold text-brand-text">${ord.orderNumber}</span>
-                                            <span class="ml-3 text-xs text-muted">${ord.createdAt}</span>
+                        <div class="rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
+                            <div class="hidden border-b border-sand pb-3 text-xs font-semibold tracking-wider text-muted uppercase md:grid md:grid-cols-[1.4fr_2fr_1fr_1fr_1fr] md:gap-4">
+                                <span>Order ID</span>
+                                <span>Item</span>
+                                <span>Price</span>
+                                <span>Status</span>
+                                <span class="text-right">Date</span>
+                            </div>
+
+                            <ul class="divide-y divide-sand/70">
+                                <c:forEach var="order" items="${orders}">
+                                    <li class="py-3 sm:py-4 md:grid md:grid-cols-[1.4fr_2fr_1fr_1fr_1fr] md:items-center md:gap-4 text-xs sm:text-sm">
+                                        <div class="flex items-center justify-between md:block">
+                                            <span class="font-mono text-[11px] sm:text-xs md:text-sm font-medium text-ink">${order.orderNumber}</span>
+                                            <span class="inline-flex md:hidden items-center rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-success capitalize border border-green-200">
+                                                ${order.status}
+                                            </span>
                                         </div>
-                                        <span class="mt-2 sm:mt-0 inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-xs font-semibold text-green-800 uppercase">
-                                            ${ord.status}
+                                        <div class="mt-1 md:mt-0 font-medium text-ink truncate">
+                                            ${order.productName}
+                                        </div>
+                                        <div class="mt-1 flex items-center justify-between md:mt-0 md:block">
+                                            <span class="text-brand-text font-medium whitespace-nowrap text-xs sm:text-sm">IDR ${order.formattedPrice}</span>
+                                            <span class="text-[11px] text-muted md:hidden">${order.createdAt}</span>
+                                        </div>
+                                        <div class="hidden md:block">
+                                            <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-success capitalize border border-green-200">
+                                                ${order.status}
+                                            </span>
+                                        </div>
+                                        <span class="hidden md:block text-xs text-muted md:text-right whitespace-nowrap">
+                                            ${order.createdAt}
                                         </span>
-                                    </div>
-                                    <div class="mt-4 flex items-center justify-between">
-                                        <div>
-                                            <h3 class="text-base font-medium text-ink">${ord.productName}</h3>
-                                            <p class="text-xs text-muted">${ord.customerEmail}</p>
-                                        </div>
-                                        <p class="text-base font-bold text-ink">IDR ${ord.formattedPrice}</p>
-                                    </div>
-                                </div>
-                            </c:forEach>
+                                    </li>
+                                </c:forEach>
+                            </ul>
                         </div>
                     </c:when>
                     <c:otherwise>
                         <div class="rounded-2xl border border-sand bg-white p-12 text-center shadow-sm">
-                            <p class="font-serif text-xl font-semibold text-ink">No orders yet</p>
-                            <p class="mt-2 text-sm text-muted">When you place an order, it will appear right here.</p>
-                            <a href="${pageContext.request.contextPath}/" class="mt-6 inline-flex rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-dark">
-                                Shop Now
+                            <p class="font-heading text-xl font-medium text-ink">You haven't placed any orders yet</p>
+                            <p class="mt-2 text-sm text-muted">When you checkout items, your receipts and order histories will appear here.</p>
+                            <a href="${pageContext.request.contextPath}/"
+                               class="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-brand px-6 text-sm font-medium text-white transition hover:bg-brand-dark">
+                                Start Shopping
                             </a>
                         </div>
                     </c:otherwise>

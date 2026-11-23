@@ -1,6 +1,7 @@
 package com.mijusan.controller;
 
 import com.mijusan.model.Product;
+import com.mijusan.model.ProductDTO;
 import com.mijusan.model.User;
 import com.mijusan.service.ProductService;
 import com.mijusan.service.WishlistService;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "ProductDetailServlet", urlPatterns = {"/product/*"})
@@ -30,7 +32,41 @@ public class ProductDetailServlet extends HttpServlet {
             return;
         }
 
-        List<Product> recommendations = productService.getRecommendations(product.getId(), 8);
+        String ctx = req.getContextPath();
+        String img = ctx + "/assets/images/" + product.getImage();
+        String secImg = (product.getSecondImage() != null && !product.getSecondImage().isEmpty())
+                ? ctx + "/assets/images/" + product.getSecondImage()
+                : img;
+
+        ProductDTO productDTO = new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getPrice(),
+                img,
+                secImg,
+                ctx + "/product/" + product.getSlug(),
+                product.getSlug()
+        );
+        productDTO.setDescription(product.getDescription());
+
+        // 8 Recommendations for "Discover your style"
+        List<Product> recs = productService.getRecommendations(product.getId(), 8);
+        List<ProductDTO> discoverProducts = new ArrayList<>();
+        for (Product p : recs) {
+            String pImg = ctx + "/assets/images/" + p.getImage();
+            String pSec = (p.getSecondImage() != null && !p.getSecondImage().isEmpty())
+                    ? ctx + "/assets/images/" + p.getSecondImage()
+                    : pImg;
+            discoverProducts.add(new ProductDTO(
+                    p.getId(),
+                    p.getName(),
+                    p.getPrice(),
+                    pImg,
+                    pSec,
+                    ctx + "/product/" + p.getSlug(),
+                    p.getSlug()
+            ));
+        }
 
         boolean isWishlisted = false;
         HttpSession session = req.getSession(false);
@@ -41,9 +77,9 @@ public class ProductDetailServlet extends HttpServlet {
             }
         }
 
-        req.setAttribute("product", product);
-        req.setAttribute("recommendations", recommendations);
+        req.setAttribute("product", productDTO);
         req.setAttribute("isWishlisted", isWishlisted);
+        req.setAttribute("discoverProducts", discoverProducts);
 
         req.getRequestDispatcher("/WEB-INF/views/product-detail.jsp").forward(req, resp);
     }

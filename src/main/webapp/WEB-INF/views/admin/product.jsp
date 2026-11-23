@@ -7,53 +7,50 @@
         <jsp:param name="title" value="Admin Product Management — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
+    <c:set var="isAdminPage" value="true" scope="request"/>
     <jsp:include page="../fragments/navbar.jsp" />
 
     <main class="flex-1">
         <div class="min-h-[calc(100vh-200px)] bg-cream">
-            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-3 sm:p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+                <c:set var="active" value="product" scope="request"/>
                 <jsp:include page="../fragments/admin-sidebar.jsp" />
 
                 <div class="w-full flex-1 min-w-0">
-                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-sm md:p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-sand pb-4">
-                            <div>
-                                <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-ink">Product Management</h1>
-                                <p class="text-sm text-muted mt-1">Total: ${total} items</p>
-                            </div>
-                            <a href="${pageContext.request.contextPath}/admin/add-product"
-                               class="inline-flex h-10 items-center justify-center rounded-xl bg-brand px-5 text-sm font-medium text-white shadow-sm hover:bg-brand-dark">
-                                + Add Product
-                            </a>
-                        </div>
+                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
+                        <h1 class="text-xl sm:text-2xl md:text-[32px] font-bold leading-tight text-black">Product Management</h1>
 
-                        <!-- Product Grid -->
-                        <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                            <c:forEach var="p" items="${products}">
-                                <article class="flex flex-col rounded-xl border border-sand bg-white p-2.5 shadow-xs transition hover:shadow-md">
-                                    <div class="relative w-full aspect-square overflow-hidden rounded-lg bg-cream">
-                                        <img src="${pageContext.request.contextPath}/assets/images/${p.image}"
-                                             alt="${p.name}" class="h-full w-full object-contain p-1">
+                        <a href="${pageContext.request.contextPath}/admin/add-product"
+                           class="mt-4 sm:mt-6 inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-warning px-3 sm:px-4 text-xs sm:text-sm md:text-base font-medium text-white transition duration-200 hover:brightness-95 focus-visible:brightness-95 outline-none">
+                            Add Product
+                        </a>
+
+                        <div class="mt-4 sm:mt-5 grid grid-cols-2 gap-2.5 sm:gap-3.5 md:[grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr))]">
+                            <c:forEach var="product" items="${products}">
+                                <article class="flex flex-col rounded-xl border border-sand bg-white p-2 sm:p-2.5 shadow-xs transition hover:shadow-md">
+                                    <div class="relative w-full aspect-[3/4] overflow-hidden rounded-lg bg-white">
+                                        <img src="${pageContext.request.contextPath}/assets/images/${product.image}"
+                                             alt="${product.name}" loading="lazy" class="h-full w-full object-contain">
                                     </div>
 
-                                    <div class="flex-1 pt-2 pb-1">
-                                        <span class="text-[10px] uppercase font-semibold text-muted">${p.category}</span>
-                                        <p class="text-xs sm:text-sm font-medium text-ink truncate" title="${p.name}">${p.name}</p>
-                                        <p class="mt-0.5 text-xs font-bold text-brand-text">IDR ${p.formattedPrice}</p>
+                                    <div class="flex-1 px-0.5 pt-1.5 pb-1 sm:pt-2 sm:pb-2">
+                                        <p class="text-[11px] sm:text-xs md:text-sm font-light uppercase leading-snug text-ink truncate" title="${product.name}">${product.name}</p>
+                                        <p class="mt-0.5 text-xs sm:text-sm font-light leading-tight text-brand-text">IDR ${product.formattedPrice}</p>
                                     </div>
 
-                                    <div class="flex gap-2 pt-2 border-t border-sand/60">
-                                        <a href="${pageContext.request.contextPath}/admin/edit-product?id=${p.id}"
-                                           class="flex-1 text-center py-1.5 rounded bg-cream text-xs font-medium text-ink hover:bg-sand/30">
+                                    <div class="flex gap-1.5 pt-1">
+                                        <a href="${pageContext.request.contextPath}/admin/edit-product?id=${product.id}"
+                                           class="flex h-7 sm:h-8 flex-1 items-center justify-center rounded bg-sage text-[11px] sm:text-xs font-light text-white transition hover:brightness-95">
                                             Edit
                                         </a>
-                                        <form action="${pageContext.request.contextPath}/admin/delete-product" method="POST" class="flex-1"
-                                              onsubmit="return confirm('Remove product ${p.name}?');">
-                                            <input type="hidden" name="id" value="${p.id}">
+
+                                        <form method="POST" action="${pageContext.request.contextPath}/admin/delete-product" class="flex-1"
+                                              onsubmit="return confirm('Remove this product?')">
+                                            <input type="hidden" name="id" value="${product.id}">
                                             <button type="submit"
-                                                    class="w-full py-1.5 rounded bg-red-50 text-xs font-medium text-red-600 hover:bg-red-100">
-                                                Delete
+                                                    class="flex h-7 sm:h-8 w-full cursor-pointer items-center justify-center rounded bg-danger text-[11px] sm:text-xs font-light text-white transition hover:brightness-95">
+                                                Remove
                                             </button>
                                         </form>
                                     </div>

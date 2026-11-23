@@ -4,46 +4,70 @@
 <html lang="en">
 <head>
     <jsp:include page="fragments/head.jsp">
-        <jsp:param name="title" value="Search Results — mijusan" />
+        <jsp:param name="title" value="${not empty query ? 'Search results for \"'.concat(query).concat('\"') : 'Search Products'} — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
     <jsp:include page="fragments/navbar.jsp" />
 
     <main class="flex-1">
-        <section class="section py-8">
-            <div class="section__inner max-w-[1440px] mx-auto px-4 md:px-8">
-                <div class="border-b border-sand pb-4 mb-6">
-                    <h1 class="font-serif text-2xl font-bold text-ink sm:text-3xl">Search Results</h1>
-                    <p class="text-sm text-muted mt-1">
-                        Showing results for <span class="font-semibold text-ink">"${query}"</span> (${products.size()} found)
-                    </p>
+        <section class="section py-6 md:py-14">
+            <div class="section__inner">
+                <div class="mb-6 flex flex-col gap-2 border-b border-sand pb-4 md:mb-8 md:pb-6">
+                    <div class="flex items-center gap-3 md:gap-4">
+                        <a href="${pageContext.request.contextPath}/"
+                           class="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-white text-ink shadow-[0_2px_8px_rgb(43_36_32/0.12)] transition duration-200 hover:bg-brand hover:text-white"
+                           aria-label="Back to home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="md:h-5 md:w-5">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                        </a>
+                        <h1 class="font-serif text-2xl font-semibold text-ink sm:text-3xl md:text-4xl">
+                            <c:choose>
+                                <c:when test="${not empty query}">
+                                    Search Results for &ldquo;${query}&rdquo;
+                                </c:when>
+                                <c:otherwise>
+                                    Search Products
+                                </c:otherwise>
+                            </c:choose>
+                        </h1>
+                    </div>
+
+                    <c:if test="${not empty query}">
+                        <p class="text-xs md:text-sm text-muted ml-12 md:ml-14">
+                            Found ${products.size()} ${products.size() == 1 ? 'product' : 'products'}
+                        </p>
+                    </c:if>
                 </div>
 
                 <c:choose>
                     <c:when test="${not empty products}">
-                        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                            <c:forEach var="p" items="${products}">
-                                <article class="flex flex-col rounded-2xl border border-sand bg-white p-3 sm:p-4 shadow-sm hover:shadow-md transition">
-                                    <a href="${pageContext.request.contextPath}/product/${p.slug}" class="aspect-square w-full overflow-hidden rounded-xl bg-cream">
-                                        <img src="${pageContext.request.contextPath}/assets/images/${p.image}"
-                                             alt="${p.name}" class="h-full w-full object-contain p-2">
-                                    </a>
-                                    <span class="mt-3 text-[11px] uppercase tracking-wider text-muted">${p.category}</span>
-                                    <h3 class="mt-1 font-heading text-sm font-medium text-ink truncate">
-                                        <a href="${pageContext.request.contextPath}/product/${p.slug}">${p.name}</a>
-                                    </h3>
-                                    <p class="mt-2 text-sm font-bold text-brand-text">IDR ${p.formattedPrice}</p>
-                                </article>
-                            </c:forEach>
-                        </div>
+                        <c:set var="items" value="${products}" scope="request"/>
+                        <jsp:include page="fragments/product-table.jsp" />
                     </c:when>
                     <c:otherwise>
-                        <div class="rounded-2xl border border-sand bg-white p-12 text-center">
-                            <p class="font-serif text-xl font-semibold text-ink">No products found</p>
-                            <p class="text-sm text-muted mt-2">Try different search keywords or explore categories on the home page.</p>
-                            <a href="${pageContext.request.contextPath}/" class="mt-6 inline-flex rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-dark">
-                                Back to Home
+                        <div class="rounded-2xl border border-sand bg-white p-12 text-center shadow-sm max-w-2xl mx-auto">
+                            <span class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-cream-dark text-muted mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="11" cy="11" r="7.5"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                                </svg>
+                            </span>
+                            <h2 class="font-heading text-xl font-medium text-ink">
+                                <c:choose>
+                                    <c:when test="${not empty query}">
+                                        No products match your search &ldquo;${query}&rdquo;
+                                    </c:when>
+                                    <c:otherwise>
+                                        Enter a search keyword
+                                    </c:otherwise>
+                                </c:choose>
+                            </h2>
+                            <p class="mt-2 text-sm text-muted">Try checking for spelling errors or searching for broader terms like "shirt", "blazer", "denim", or "jacket".</p>
+                            <a href="${pageContext.request.contextPath}/"
+                               class="mt-6 inline-flex h-11 items-center justify-center rounded-lg bg-brand px-6 text-sm font-medium text-white transition hover:bg-brand-dark">
+                                Browse All Products
                             </a>
                         </div>
                     </c:otherwise>

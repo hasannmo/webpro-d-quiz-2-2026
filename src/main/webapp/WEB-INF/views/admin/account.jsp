@@ -7,76 +7,82 @@
         <jsp:param name="title" value="Admin Account Management — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
+    <c:set var="isAdminPage" value="true" scope="request"/>
     <jsp:include page="../fragments/navbar.jsp" />
 
     <main class="flex-1">
         <div class="min-h-[calc(100vh-200px)] bg-cream">
-            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-3 sm:p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+                <c:set var="active" value="account" scope="request"/>
                 <jsp:include page="../fragments/admin-sidebar.jsp" />
 
                 <div class="w-full flex-1 min-w-0">
-                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-sm md:p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-sand pb-4">
-                            <div>
-                                <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-ink">Account Management</h1>
-                                <p class="text-sm text-muted mt-1">Total Users: ${total}</p>
-                            </div>
-                            <a href="${pageContext.request.contextPath}/admin/add-user"
-                               class="inline-flex h-10 items-center justify-center rounded-xl bg-brand px-5 text-sm font-medium text-white shadow-sm hover:bg-brand-dark">
-                                + Add User
-                            </a>
+                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
+                        <h1 class="text-xl sm:text-2xl md:text-[32px] font-bold leading-tight text-black">Account Management</h1>
+
+                        <a href="${pageContext.request.contextPath}/admin/add-user"
+                           class="mt-4 sm:mt-6 inline-flex h-9 sm:h-11 items-center justify-center rounded-lg bg-warning px-3 sm:px-4 text-xs sm:text-sm md:text-base font-medium text-white transition duration-200 hover:brightness-95 focus-visible:brightness-95 outline-none">
+                            Add User
+                        </a>
+
+                        <div class="mt-4 sm:mt-6 flex min-h-[48px] sm:min-h-[60px] items-center border-t border-muted/40 px-1 sm:px-3">
+                            <p class="text-xs sm:text-sm md:text-base font-medium text-black">Total User : ${String.format("%,d", total).replace(',', '.')}</p>
                         </div>
 
-                        <!-- Users Table -->
-                        <div class="mt-6 overflow-x-auto">
-                            <table class="w-full text-left text-sm text-ink">
-                                <thead class="border-b border-sand bg-cream-dark text-xs uppercase text-muted">
-                                    <tr>
-                                        <th class="p-3">User</th>
-                                        <th class="p-3">Email</th>
-                                        <th class="p-3">Role</th>
-                                        <th class="p-3">Registered</th>
-                                        <th class="p-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-sand/70">
+                        <!-- Responsive Table Container -->
+                        <div class="w-full overflow-x-auto [scrollbar-width:thin]">
+                            <div class="min-w-[620px] md:min-w-0">
+                                <!-- Table Header -->
+                                <div class="hidden border-t border-muted/40 px-3 py-3 text-xs font-semibold tracking-wider text-muted uppercase md:grid md:grid-cols-[1.5fr_1.8fr_1fr_1.3fr_90px] md:items-center md:gap-3">
+                                    <span>User</span>
+                                    <span>Email</span>
+                                    <span>Role</span>
+                                    <span>Date & Time</span>
+                                    <span class="text-right">Action</span>
+                                </div>
+
+                                <ul>
                                     <c:forEach var="u" items="${users}">
-                                        <tr class="hover:bg-cream/50">
-                                            <td class="p-3">
-                                                <div class="font-medium text-ink">${u.name}</div>
-                                                <div class="text-xs text-muted">@${u.username}</div>
-                                            </td>
-                                            <td class="p-3 text-muted">${u.email}</td>
-                                            <td class="p-3">
-                                                <form action="${pageContext.request.contextPath}/admin/update-role" method="POST" class="inline">
-                                                    <input type="hidden" name="id" value="${u.id}">
-                                                    <select name="role" onchange="this.form.submit()"
-                                                            class="rounded-lg border border-sand bg-white px-2 py-1 text-xs font-semibold ${u.admin ? 'text-brand-text' : 'text-ink'}">
-                                                        <option value="Customer" ${u.role == 'Customer' ? 'selected' : ''}>Customer</option>
-                                                        <option value="Administrator" ${u.role == 'Administrator' ? 'selected' : ''}>Administrator</option>
-                                                        <c:if test="${sessionScope.user.creator}">
-                                                            <option value="Creator" ${u.role == 'Creator' ? 'selected' : ''}>Creator</option>
-                                                        </c:if>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                            <td class="p-3 text-xs text-muted">${u.createdAt}</td>
-                                            <td class="p-3 text-right">
-                                                <c:if test="${sessionScope.user.id != u.id}">
-                                                    <form action="${pageContext.request.contextPath}/admin/delete-user" method="POST" class="inline"
-                                                          onsubmit="return confirm('Remove user ${u.name}?');">
-                                                        <input type="hidden" name="id" value="${u.id}">
-                                                        <button type="submit" class="text-xs text-red-600 hover:underline">
-                                                            Remove
-                                                        </button>
-                                                    </form>
-                                                </c:if>
-                                            </td>
-                                        </tr>
+                                        <li class="flex flex-col gap-1.5 border-t border-muted/20 px-2 py-3 text-xs md:text-sm font-light text-black md:grid md:min-h-[58px] md:grid-cols-[1.5fr_1.8fr_1fr_1.3fr_90px] md:items-center md:gap-3 md:py-0">
+                                            <div class="flex items-center justify-between md:block">
+                                                <div>
+                                                    <p class="font-normal text-ink leading-tight">${u.name}</p>
+                                                    <p class="text-[11px] text-muted leading-tight md:hidden">@${u.username}</p>
+                                                </div>
+                                                <span class="inline-flex md:hidden rounded-full bg-sand px-2 py-0.5 text-[10px] font-medium text-ink capitalize">
+                                                    ${u.role}
+                                                </span>
+                                            </div>
+
+                                            <div class="flex items-center justify-between md:block">
+                                                <a href="mailto:${u.email}" class="text-brand-text truncate text-xs md:text-sm hover:underline" title="${u.email}">${u.email}</a>
+                                                <span class="text-[10px] text-muted md:hidden">${u.createdAt}</span>
+                                            </div>
+
+                                            <div class="hidden md:block">
+                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${u.admin ? 'bg-brand/10 text-brand-text' : 'bg-sand text-ink'}">
+                                                    ${u.role}
+                                                </span>
+                                            </div>
+
+                                            <span class="hidden md:block text-xs text-muted whitespace-nowrap">${u.createdAt}</span>
+
+                                            <div class="mt-1 flex items-center justify-end gap-2 md:mt-0">
+                                                <button type="button"
+                                                        data-manage-user
+                                                        data-id="${u.id}"
+                                                        data-username="${u.username}"
+                                                        data-email="${u.email}"
+                                                        data-role="${u.role}"
+                                                        class="inline-flex h-7 sm:h-8 items-center justify-center rounded bg-sage px-3 text-[11px] sm:text-xs font-light text-white transition hover:brightness-95">
+                                                    Manage
+                                                </button>
+                                            </div>
+                                        </li>
                                     </c:forEach>
-                                </tbody>
-                            </table>
+                                </ul>
+                            </div>
                         </div>
 
                         <!-- Pagination -->
@@ -96,6 +102,81 @@
         </div>
     </main>
 
+    <!-- Manage User Modal -->
+    <div id="manageUserModal" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
+        <div class="relative w-full max-w-md rounded-2xl border border-sand bg-white p-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-sand pb-3">
+                <h3 class="font-heading text-2xl font-medium text-ink">Manage User</h3>
+                <button type="button" id="closeManageModal" class="text-muted hover:text-ink text-2xl font-light">&times;</button>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-sm text-muted">User Account</p>
+                <p id="modalUserDisplay" class="font-medium text-lg text-ink"></p>
+                <p id="modalEmailDisplay" class="text-sm text-brand-text"></p>
+            </div>
+
+            <!-- Role Update Form -->
+            <form id="updateRoleForm" method="POST" action="${pageContext.request.contextPath}/admin/update-role" class="mt-5 border-t border-sand pt-4">
+                <input type="hidden" name="id" id="modalUserId">
+                <label for="modalRoleSelect" class="block text-sm font-medium text-ink">Change Role</label>
+                <div class="mt-2 flex gap-3">
+                    <select name="role" id="modalRoleSelect" class="flex-1 rounded-lg border border-sand bg-cream-dark px-3 py-2 text-base text-ink outline-none focus:border-brand">
+                        <option value="Customer">Customer</option>
+                        <option value="Administrator">Administrator</option>
+                        <c:if test="${sessionScope.user.creator}">
+                            <option value="Creator">Creator</option>
+                        </c:if>
+                    </select>
+                    <button type="submit" class="rounded-lg bg-brand px-5 py-2 text-sm font-medium text-white transition hover:bg-brand-dark">
+                        Save Role
+                    </button>
+                </div>
+            </form>
+
+            <!-- Delete User Form -->
+            <form id="deleteUserForm" method="POST" action="${pageContext.request.contextPath}/admin/delete-user" class="mt-6 border-t border-sand pt-4" onsubmit="return confirm('Are you sure you want to permanently remove this user?');">
+                <input type="hidden" name="id" id="modalDeleteUserId">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-danger">Remove User</p>
+                        <p class="text-xs text-muted">This action will delete user data.</p>
+                    </div>
+                    <button type="submit" class="rounded-lg bg-danger px-4 py-2 text-sm font-medium text-white transition hover:opacity-90">
+                        Remove
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <jsp:include page="../fragments/footer.jsp" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('manageUserModal');
+            const closeBtn = document.getElementById('closeManageModal');
+            const userDisplay = document.getElementById('modalUserDisplay');
+            const emailDisplay = document.getElementById('modalEmailDisplay');
+            const roleSelect = document.getElementById('modalRoleSelect');
+            const userIdInput = document.getElementById('modalUserId');
+            const deleteUserIdInput = document.getElementById('modalDeleteUserId');
+
+            const closeModal = () => { modal.hidden = true; };
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+            document.querySelectorAll('[data-manage-user]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    userDisplay.textContent = btn.dataset.username;
+                    emailDisplay.textContent = btn.dataset.email;
+                    roleSelect.value = btn.dataset.role;
+                    userIdInput.value = btn.dataset.id;
+                    deleteUserIdInput.value = btn.dataset.id;
+                    modal.hidden = false;
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,6 +1,8 @@
 package com.mijusan.controller;
 
 import com.google.gson.Gson;
+import com.mijusan.model.Product;
+import com.mijusan.model.ProductDTO;
 import com.mijusan.model.User;
 import com.mijusan.model.Wishlist;
 import com.mijusan.service.WishlistService;
@@ -12,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +33,20 @@ public class WishlistServlet extends HttpServlet {
         }
 
         List<Wishlist> wishlistItems = wishlistService.getUserWishlist(user.getId());
-        req.setAttribute("wishlistItems", wishlistItems);
+        String ctx = req.getContextPath();
+        List<ProductDTO> items = new ArrayList<>();
+        for (Wishlist w : wishlistItems) {
+            Product p = w.getProduct();
+            if (p != null) {
+                String img = ctx + "/assets/images/" + p.getImage();
+                String secImg = (p.getSecondImage() != null && !p.getSecondImage().isEmpty())
+                        ? ctx + "/assets/images/" + p.getSecondImage()
+                        : img;
+                items.add(new ProductDTO(p.getId(), p.getName(), p.getPrice(), img, secImg, ctx + "/product/" + p.getSlug(), p.getSlug()));
+            }
+        }
+
+        req.setAttribute("wishlistItems", items);
         req.getRequestDispatcher("/WEB-INF/views/wishlist.jsp").forward(req, resp);
     }
 
@@ -46,7 +62,6 @@ public class WishlistServlet extends HttpServlet {
         int productId = 0;
         try {
             if (pathInfo != null && pathInfo.length() > 1) {
-                // e.g. /12/toggle
                 String[] parts = pathInfo.split("/");
                 if (parts.length > 1) {
                     productId = Integer.parseInt(parts[1]);
@@ -67,6 +82,7 @@ public class WishlistServlet extends HttpServlet {
             Map<String, Object> map = new HashMap<>();
             map.put("success", true);
             map.put("isWishlisted", isWishlisted);
+            map.put("status", isWishlisted ? "added" : "removed");
             resp.getWriter().write(gson.toJson(map));
         } else {
             resp.sendRedirect(req.getContextPath() + "/wishlist");

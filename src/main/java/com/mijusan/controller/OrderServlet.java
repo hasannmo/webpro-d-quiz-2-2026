@@ -2,6 +2,7 @@ package com.mijusan.controller;
 
 import com.mijusan.model.Order;
 import com.mijusan.model.Product;
+import com.mijusan.model.ProductDTO;
 import com.mijusan.model.User;
 import com.mijusan.service.OrderService;
 import com.mijusan.service.ProductService;
@@ -41,7 +42,20 @@ public class OrderServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath() + "/");
                 return;
             }
-            req.setAttribute("product", product);
+            String ctx = req.getContextPath();
+            ProductDTO dto = new ProductDTO(
+                    product.getId(),
+                    product.getName(),
+                    product.getPrice(),
+                    ctx + "/assets/images/" + product.getImage(),
+                    null,
+                    ctx + "/product/" + product.getSlug(),
+                    product.getSlug()
+            );
+            req.setAttribute("product", dto);
+            req.setAttribute("confirmed", false);
+            req.setAttribute("confirmAction", ctx + "/checkout/" + product.getSlug());
+            req.setAttribute("cancelHref", ctx + "/product/" + product.getSlug());
             req.getRequestDispatcher("/WEB-INF/views/checkout.jsp").forward(req, resp);
         }
     }

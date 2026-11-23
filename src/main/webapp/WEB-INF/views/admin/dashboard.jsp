@@ -7,60 +7,44 @@
         <jsp:param name="title" value="Admin Dashboard — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
+    <c:set var="isAdminPage" value="true" scope="request"/>
     <jsp:include page="../fragments/navbar.jsp" />
 
     <main class="flex-1">
         <div class="min-h-[calc(100vh-200px)] bg-cream">
-            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-3 sm:p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+                <c:set var="active" value="dashboard" scope="request"/>
                 <jsp:include page="../fragments/admin-sidebar.jsp" />
 
                 <div class="w-full flex-1 min-w-0">
-                    <section class="w-full rounded-2xl border border-sand bg-white p-6 shadow-sm md:p-8">
-                        <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-ink">Dashboard Overview</h1>
-
-                        <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-                            <div class="rounded-xl border border-sand bg-cream p-6">
-                                <span class="text-xs font-semibold uppercase text-muted">Total Products</span>
-                                <p class="mt-2 text-3xl font-bold text-ink">${totalProduct}</p>
-                                <a href="${pageContext.request.contextPath}/admin/product" class="mt-4 inline-block text-xs font-semibold text-brand hover:underline">
-                                    Manage Products &rarr;
-                                </a>
-                            </div>
-
-                            <div class="rounded-xl border border-sand bg-cream p-6">
-                                <span class="text-xs font-semibold uppercase text-muted">Total Orders</span>
-                                <p class="mt-2 text-3xl font-bold text-ink">${totalOrder}</p>
-                                <a href="${pageContext.request.contextPath}/admin/order" class="mt-4 inline-block text-xs font-semibold text-brand hover:underline">
-                                    Manage Orders &rarr;
-                                </a>
-                            </div>
-
-                            <div class="rounded-xl border border-sand bg-cream p-6">
-                                <span class="text-xs font-semibold uppercase text-muted">Registered Users</span>
-                                <p class="mt-2 text-3xl font-bold text-ink">${totalUser}</p>
-                                <a href="${pageContext.request.contextPath}/admin/account" class="mt-4 inline-block text-xs font-semibold text-brand hover:underline">
-                                    Manage Accounts &rarr;
-                                </a>
-                            </div>
+                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
+                        <!-- Range Select Header -->
+                        <div class="relative inline-block">
+                            <span class="text-base font-normal text-black">Order Over Time : <span class="font-medium text-brand-text">Last 7 Days</span></span>
                         </div>
 
-                        <div class="mt-10 border-t border-sand pt-6">
-                            <h2 class="text-lg font-bold text-ink mb-4">Quick Shortcuts</h2>
-                            <div class="flex flex-wrap gap-4">
-                                <a href="${pageContext.request.contextPath}/admin/add-product"
-                                   class="rounded-xl bg-brand px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-brand-dark">
-                                    + Add New Product
-                                </a>
-                                <a href="${pageContext.request.contextPath}/admin/add-user"
-                                   class="rounded-xl border border-sand bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream">
-                                    + Add New User
-                                </a>
-                                <a href="${pageContext.request.contextPath}/"
-                                   class="rounded-xl border border-sand bg-white px-5 py-2.5 text-sm font-medium text-ink hover:bg-cream">
-                                    View Storefront
-                                </a>
-                            </div>
+                        <!-- Chart Container -->
+                        <div class="mt-3 h-[240px] sm:h-[320px] w-full rounded-lg bg-cream-dark md:h-[500px]">
+                            <jsp:include page="../fragments/order-chart.jsp" />
+                        </div>
+
+                        <!-- Total Order Stat Row -->
+                        <div class="mt-3 flex min-h-[64px] sm:min-h-[76px] items-center justify-between gap-3 border-t border-muted/40 px-1 sm:px-2.5">
+                            <p class="text-sm sm:text-base md:text-[18px] font-medium text-black">Total Order : ${String.format("%,d", totalOrder).replace(',', '.')}</p>
+                            <a href="${pageContext.request.contextPath}/admin/order"
+                               class="inline-flex h-9 sm:h-11 shrink-0 items-center justify-center rounded-md bg-sage px-3 text-xs sm:text-sm md:text-base font-light text-white transition duration-200 hover:brightness-95">
+                                Manage
+                            </a>
+                        </div>
+
+                        <!-- Total User Stat Row -->
+                        <div class="flex min-h-[64px] sm:min-h-[76px] items-center justify-between gap-3 border-t border-muted/40 px-1 sm:px-2.5">
+                            <p class="text-sm sm:text-base md:text-[18px] font-medium text-black">Total User : ${String.format("%,d", totalUser).replace(',', '.')}</p>
+                            <a href="${pageContext.request.contextPath}/admin/account"
+                               class="inline-flex h-9 sm:h-11 shrink-0 items-center justify-center rounded-md bg-sage px-3 text-xs sm:text-sm md:text-base font-light text-white transition duration-200 hover:brightness-95">
+                                Manage
+                            </a>
                         </div>
                     </section>
                 </div>

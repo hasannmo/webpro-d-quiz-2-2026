@@ -7,58 +7,62 @@
         <jsp:param name="title" value="Checkout — ${product.name}" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
     <jsp:include page="fragments/navbar.jsp" />
 
     <main class="flex-1">
-        <section class="section py-10">
-            <div class="section__inner max-w-xl mx-auto px-4">
-                <div class="rounded-2xl border border-sand bg-white p-6 sm:p-8 shadow-md">
-                    <h1 class="font-serif text-2xl font-bold text-ink sm:text-3xl border-b border-sand pb-4">
-                        Confirm Purchase
-                    </h1>
+        <section class="section py-8 md:py-16">
+            <div class="section__inner max-w-4xl mx-auto">
+                <div class="mb-6 flex items-center">
+                    <a href="${cancelHref}"
+                       class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink shadow-[0_2px_8px_rgb(43_36_32/0.12)] transition duration-200 hover:bg-brand hover:text-white"
+                       aria-label="Back to product">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </a>
+                </div>
 
-                    <div class="mt-6 flex items-center gap-4">
-                        <div class="h-20 w-20 overflow-hidden rounded-xl border border-sand bg-cream p-2">
-                            <img src="${pageContext.request.contextPath}/assets/images/${product.image}"
-                                 alt="${product.name}" class="h-full w-full object-contain">
-                        </div>
-                        <div>
-                            <span class="text-xs uppercase text-muted font-semibold">${product.category}</span>
-                            <h2 class="text-base font-semibold text-ink">${product.name}</h2>
-                            <p class="text-sm font-bold text-brand-text">IDR ${product.formattedPrice}</p>
-                        </div>
+                <div class="grid w-full gap-6 rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:grid-cols-2 md:gap-10 md:p-10">
+                    <div class="flex items-center justify-center p-2">
+                        <img src="${product.image}" alt="${product.name}" class="block max-h-[260px] sm:max-h-[340px] md:max-h-[420px] w-full object-contain">
                     </div>
 
-                    <div class="mt-6 space-y-3 border-t border-sand pt-4 text-sm">
-                        <div class="flex justify-between text-muted">
-                            <span>Recipient</span>
-                            <span class="font-medium text-ink">${sessionScope.user.name}</span>
-                        </div>
-                        <div class="flex justify-between text-muted">
-                            <span>Email</span>
-                            <span class="font-medium text-ink">${sessionScope.user.email}</span>
-                        </div>
-                        <div class="flex justify-between text-muted">
-                            <span>Shipping</span>
-                            <span class="font-medium text-ink">Free Delivery</span>
-                        </div>
-                        <div class="border-t border-sand pt-3 flex justify-between font-serif text-lg font-bold text-ink">
-                            <span>Total</span>
-                            <span class="text-brand-text">IDR ${product.formattedPrice}</span>
-                        </div>
-                    </div>
+                    <div class="flex flex-col">
+                        <h1 class="border-b border-ink pb-1 font-heading text-2xl sm:text-3xl font-medium leading-tight tracking-tight text-ink md:text-[36px]">Finish Your Checkout</h1>
 
-                    <form action="${pageContext.request.contextPath}/checkout/${product.slug}" method="POST" class="mt-8">
-                        <button type="submit"
-                                class="w-full inline-flex h-12 items-center justify-center rounded-xl bg-brand font-medium text-white shadow-md transition hover:bg-brand-dark">
-                            Place Order
-                        </button>
-                        <a href="${pageContext.request.contextPath}/product/${product.slug}"
-                           class="mt-3 block text-center text-sm text-muted hover:text-ink">
-                            Cancel
-                        </a>
-                    </form>
+                        <h2 class="mt-3 sm:mt-4 font-heading text-lg sm:text-xl font-medium leading-tight text-ink md:text-[26px]">${product.name}</h2>
+                        <p class="mt-1 sm:mt-2 font-heading text-base sm:text-lg font-medium leading-tight text-brand-text">IDR ${product.formattedPrice}</p>
+
+                        <c:choose>
+                            <c:when test="${confirmed}">
+                                <div aria-disabled="true" role="status"
+                                     class="mt-6 sm:mt-8 flex h-11 sm:h-12 w-full cursor-not-allowed select-none items-center justify-center rounded-lg bg-sand text-sm sm:text-base font-normal text-muted">
+                                    Checkout Confirmed
+                                </div>
+                                <p class="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-normal leading-snug text-black">Your order will be recorded and processed shortly.</p>
+                            </c:when>
+                            <c:otherwise>
+                                <form method="POST" action="${confirmAction}" class="mt-6 sm:mt-8">
+                                    <button type="submit"
+                                            class="flex h-11 sm:h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-brand text-sm sm:text-base font-medium text-white transition-colors duration-200 hover:bg-brand-dark focus-visible:bg-brand-dark outline-none">
+                                        Confirm Checkout
+                                    </button>
+                                </form>
+
+                                <a href="${cancelHref}"
+                                   class="mt-2.5 sm:mt-3 flex h-11 sm:h-12 w-full items-center justify-center rounded-lg bg-danger text-sm sm:text-base font-medium text-white transition-opacity duration-200 hover:opacity-90 focus-visible:opacity-90 outline-none">
+                                    Cancel Checkout
+                                </a>
+                            </c:otherwise>
+                        </c:choose>
+
+                        <p class="${confirmed ? 'mt-6' : 'mt-6 sm:mt-8'} text-xs sm:text-sm font-normal leading-snug text-black">
+                            Having any issues?<br>
+                            contact us at <a href="mailto:customerservice@mijusan.com" class="text-brand-text hover:underline">customerservice@mijusan.com</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>

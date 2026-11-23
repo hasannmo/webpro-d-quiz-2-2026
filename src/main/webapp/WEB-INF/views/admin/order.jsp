@@ -7,65 +7,62 @@
         <jsp:param name="title" value="Admin Order Management — mijusan" />
     </jsp:include>
 </head>
-<body class="flex min-h-screen flex-col bg-cream">
+<body class="flex min-h-screen flex-col">
+    <c:set var="isAdminPage" value="true" scope="request"/>
     <jsp:include page="../fragments/navbar.jsp" />
 
     <main class="flex-1">
         <div class="min-h-[calc(100vh-200px)] bg-cream">
-            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+            <div class="mx-auto flex w-full max-w-[1440px] flex-col items-start gap-4 p-3 sm:p-4 md:flex-row md:gap-6 md:px-8 md:py-10">
+                <c:set var="active" value="order" scope="request"/>
                 <jsp:include page="../fragments/admin-sidebar.jsp" />
 
                 <div class="w-full flex-1 min-w-0">
-                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-sm md:p-8">
-                        <div class="border-b border-sand pb-4">
-                            <h1 class="text-2xl sm:text-3xl font-bold leading-tight text-ink">Order Management</h1>
-                            <p class="text-sm text-muted mt-1">Total: ${total} orders recorded</p>
+                    <section class="w-full rounded-2xl border border-sand bg-white p-4 sm:p-6 shadow-[0_4px_20px_rgb(43_36_32/0.06)] md:p-8">
+                        <!-- Range Select Header -->
+                        <div class="relative inline-block">
+                            <span class="text-base font-normal text-black">Order Over Time : <span class="font-medium text-brand-text">Last 7 Days</span></span>
                         </div>
 
-                        <!-- Orders Table -->
-                        <div class="mt-6 overflow-x-auto">
-                            <table class="w-full text-left text-sm text-ink">
-                                <thead class="border-b border-sand bg-cream-dark text-xs uppercase text-muted">
-                                    <tr>
-                                        <th class="p-3">Order Number</th>
-                                        <th class="p-3">Product</th>
-                                        <th class="p-3">Price</th>
-                                        <th class="p-3">Customer Email</th>
-                                        <th class="p-3">Status</th>
-                                        <th class="p-3 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-sand/70">
-                                    <c:forEach var="ord" items="${orders}">
-                                        <tr class="hover:bg-cream/50">
-                                            <td class="p-3 font-mono font-medium text-brand-text">${ord.orderNumber}</td>
-                                            <td class="p-3 font-medium">${ord.productName}</td>
-                                            <td class="p-3">IDR ${ord.formattedPrice}</td>
-                                            <td class="p-3 text-muted">${ord.customerEmail}</td>
-                                            <td class="p-3">
-                                                <form action="${pageContext.request.contextPath}/admin/order/update" method="POST" class="inline">
-                                                    <input type="hidden" name="id" value="${ord.id}">
-                                                    <select name="status" onchange="this.form.submit()"
-                                                            class="rounded-lg border border-sand bg-white px-2 py-1 text-xs font-semibold uppercase ${ord.status == 'completed' ? 'text-green-700' : 'text-yellow-700'}">
-                                                        <option value="completed" ${ord.status == 'completed' ? 'selected' : ''}>Completed</option>
-                                                        <option value="pending" ${ord.status == 'pending' ? 'selected' : ''}>Pending</option>
-                                                        <option value="cancelled" ${ord.status == 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                                                    </select>
-                                                </form>
-                                            </td>
-                                            <td class="p-3 text-right">
-                                                <form action="${pageContext.request.contextPath}/admin/order/delete" method="POST" class="inline"
-                                                      onsubmit="return confirm('Delete order ${ord.orderNumber}?');">
-                                                    <input type="hidden" name="id" value="${ord.id}">
-                                                    <button type="submit" class="text-xs text-red-600 hover:underline">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
+                        <!-- Chart Container -->
+                        <div class="mt-3 h-[240px] sm:h-[320px] w-full rounded-lg bg-cream-dark md:h-[500px]">
+                            <jsp:include page="../fragments/order-chart.jsp" />
+                        </div>
+
+                        <div class="mt-3 flex min-h-[60px] sm:min-h-[76px] items-center border-t border-muted/40 px-1 sm:px-2.5">
+                            <p class="text-sm sm:text-base md:text-[18px] font-medium text-black">Total Order : ${String.format("%,d", total).replace(',', '.')}</p>
+                        </div>
+
+                        <!-- Responsive Table Container -->
+                        <div class="w-full overflow-x-auto [scrollbar-width:thin]">
+                            <div class="min-w-[640px] md:min-w-0">
+                                <!-- Table Header -->
+                                <div class="hidden border-t border-muted/40 px-3 py-3 text-xs font-semibold tracking-wider text-muted uppercase md:grid md:grid-cols-[1.5fr_2fr_1.1fr_1.8fr_1.2fr] md:items-center md:gap-3">
+                                    <span>Order ID</span>
+                                    <span>Product</span>
+                                    <span>Price</span>
+                                    <span>Customer Email</span>
+                                    <span class="text-right">Date & Time</span>
+                                </div>
+
+                                <ul>
+                                    <c:forEach var="order" items="${orders}">
+                                        <li class="flex flex-col gap-1 border-t border-muted/20 px-2 py-2.5 text-xs md:text-sm font-light text-black md:grid md:min-h-[54px] md:grid-cols-[1.5fr_2fr_1.1fr_1.8fr_1.2fr] md:items-center md:gap-3 md:py-0">
+                                            <div class="flex items-center justify-between md:block">
+                                                <span class="font-mono text-[11px] md:text-xs font-medium text-ink truncate block" title="${order.orderNumber}">${order.orderNumber}</span>
+                                                <span class="text-[10px] md:hidden text-muted whitespace-nowrap">${order.createdAt}</span>
+                                            </div>
+                                            <span class="font-normal text-ink leading-tight pr-2 truncate block" title="${order.productName}">${order.productName}</span>
+                                            <div class="flex items-center justify-between md:block">
+                                                <span class="font-medium text-brand-text md:text-ink md:font-normal whitespace-nowrap text-xs md:text-sm">IDR ${order.formattedPrice}</span>
+                                                <a href="mailto:${order.customerEmail}" class="w-fit text-brand-text truncate text-xs hover:underline md:hidden" title="${order.customerEmail}">${order.customerEmail}</a>
+                                            </div>
+                                            <a href="mailto:${order.customerEmail}" class="hidden md:inline-block w-fit text-brand-text truncate hover:underline" title="${order.customerEmail}">${order.customerEmail}</a>
+                                            <span class="hidden md:block text-xs text-muted md:text-right whitespace-nowrap">${order.createdAt}</span>
+                                        </li>
                                     </c:forEach>
-                                </tbody>
-                            </table>
+                                </ul>
+                            </div>
                         </div>
 
                         <!-- Pagination -->
